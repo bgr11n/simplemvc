@@ -14,16 +14,12 @@ module Simplemvc
     end
 
     def check_url url
-      puts @routes.inspect
       @routes.each do |r|
-        puts '1'
-        match = r[:regexp].match url
+        match = r[:regexp].match(url)
         if match
-          puts '2'
           if r[:target] =~ /^([^#]+)#([^#]+)$/
-            puts '3'
             controller_name = $1.to_camel_case
-            controller = Object.get_const("#{controller_name}Controller")
+            controller = Object.const_get("#{controller_name}Controller")
             return controller.action($2)
           end
         end
@@ -32,11 +28,8 @@ module Simplemvc
   end
 
   class App
-    def initialize
-      @router = Simplemvc::Router.new
-    end
-
     def route &block
+      @router ||= Simplemvc::Router.new
       @router.instance_eval &block
     end
 
